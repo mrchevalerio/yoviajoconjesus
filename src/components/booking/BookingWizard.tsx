@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { EASE_OUT } from "@/lib/motion";
-import { MAX_PASSENGERS } from "@/lib/pricing";
+import { MAX_PASSENGERS, fareForAddress } from "@/lib/pricing";
+import { supabase } from "@/lib/supabase";
 import ProgressBar from "./ProgressBar";
 import StepFlight from "./StepFlight";
 import StepContact from "./StepContact";
@@ -49,6 +50,30 @@ export default function BookingWizard() {
 
   const patch = (p: Partial<BookingData>) => setData((prev) => ({ ...prev, ...p }));
 
+  async function handleConfirmed(reference: string) {
+    const { error } = await supabase.from("bookings").insert({
+      reference,
+      full_name: data.name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      pickup_date: data.date || null,
+      pickup_time: data.time || null,
+      passengers: data.passengers,
+      luggage: data.luggage,
+      airline_code: data.airlineCode,
+      flight_number: data.flightNumber,
+      fare: fareForAddress(data.address),
+      status: "confirmed",
+    });
+
+    // Payment already succeeded — don't block the confirmation screen on a
+    // database hiccup, just leave a trace for follow-up.
+    if (error) console.error("Failed to save booking:", error.message);
+
+    setReference(reference);
+  }
+
   function goNext() {
     if (step < TOTAL_STEPS && isStepValid(step, data)) {
       setDirection(1);
@@ -90,7 +115,7 @@ export default function BookingWizard() {
             data={data}
             processing={processing}
             setProcessing={setProcessing}
-            onConfirmed={setReference}
+            onConfirmed={handleConfirmed}
           />
         )}
       </motion.div>
