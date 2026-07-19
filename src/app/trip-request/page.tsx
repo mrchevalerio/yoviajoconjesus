@@ -3,6 +3,11 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import TripRequestForm from "@/components/TripRequestForm";
 
+// Depends on the Supabase client at request time (via TripRequestForm) —
+// must not be statically prerendered at build time, when env vars aren't
+// guaranteed to be present.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Solicita un viaje | Yo Viajo con Jesus",
 };
