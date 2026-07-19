@@ -33,6 +33,7 @@ export default function Footer() {
           <ul className="flex flex-col gap-2 text-sm text-ink-soft">
             <li><a href="#faq" className="hover:text-ink">{t("nav.faq")}</a></li>
             <li><Link href="/" className="hover:text-ink">{t("nav.cta")}</Link></li>
+            <li><Link href="/trip-request" className="hover:text-ink">{t("nav.tripRequest")}</Link></li>
           </ul>
         </div>
 
@@ -49,7 +50,12 @@ export default function Footer() {
             </li>
             <li className="text-ink-faint">{t("footer.hours")}</li>
           </ul>
-          <p className="mt-3 text-xs italic text-ink-faint">{t("footer.placeholder")}</p>
+          <Link
+            href="/trip-request"
+            className="mt-3 inline-block text-sm font-semibold text-accent-dark hover:underline"
+          >
+            {t("nav.tripRequest")}
+          </Link>
         </div>
       </div>
 

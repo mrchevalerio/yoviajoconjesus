@@ -18,9 +18,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Yo Viajo con Jesus | Airport Car Service to JFK",
+  title: "Yo Viajo con Jesus | Servicio de Transporte al Aeropuerto JFK",
   description:
-    "Reliable airport car service from Washington Heights, Inwood, and the Bronx to JFK. Flight-tracked pickups, flat local rates, booked in a minute.",
+    "Servicio confiable de transporte al aeropuerto desde Washington Heights, Inwood y el Bronx hasta el JFK. Recogidas con seguimiento de vuelo, tarifas fijas, reservado en un minuto.",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="es" className={`${fraunces.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg text-ink">
         <LanguageProvider>
           <a href="#main" className="skip-link">

@@ -13,10 +13,12 @@ import { SUPPORTED_LANGS, translations, type Lang, type TranslationKey } from ".
 
 const LANG_KEY = "yvcj-lang";
 
+const DEFAULT_LANG: Lang = "es";
+
 function sanitizeLang(value: string | null): Lang {
   return (SUPPORTED_LANGS as readonly string[]).includes(value ?? "")
     ? (value as Lang)
-    : "en";
+    : DEFAULT_LANG;
 }
 
 interface LanguageContextValue {
@@ -28,7 +30,7 @@ interface LanguageContextValue {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("en");
+  const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
 
   useEffect(() => {
     // Reads a browser-only API unavailable during SSR, so it must run post-mount.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { List, X } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -8,7 +9,7 @@ import { EASE_OUT } from "@/lib/motion";
 import LanguageToggle from "./LanguageToggle";
 
 const NAV_LINKS: { href: string; key: Parameters<ReturnType<typeof useLanguage>["t"]>[0] }[] = [
-  { href: "#faq", key: "nav.faq" },
+  { href: "/#faq", key: "nav.faq" },
 ];
 
 export default function Nav() {
@@ -39,7 +40,14 @@ export default function Nav() {
             : "py-5 bg-transparent"
         }`}
       >
-        <div className="wrap flex items-center justify-end gap-6">
+        <div className="wrap flex items-center gap-6">
+          <Link
+            href="/"
+            className="mr-auto text-[15px] font-semibold text-ink transition-colors hover:text-accent"
+          >
+            {t("nav.home")}
+          </Link>
+
           <nav className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <a
@@ -79,6 +87,13 @@ export default function Nav() {
             className="fixed inset-0 top-0 z-[90] h-dvh overflow-y-auto bg-bg pt-24"
           >
             <nav className="wrap flex flex-col gap-1">
+              <Link
+                href="/"
+                onClick={() => setMenuOpen(false)}
+                className="border-b border-border py-4 font-[family-name:var(--font-display)] text-[28px] font-medium text-ink"
+              >
+                {t("nav.home")}
+              </Link>
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
