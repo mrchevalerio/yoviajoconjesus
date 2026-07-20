@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
   if (!secretKey) {
     return NextResponse.json({
       demo: true,
+      livemode: false,
       clientSecret: null,
       amount: amount / 100,
       currency,
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       demo: false,
+      livemode: paymentIntent.livemode,
       clientSecret: paymentIntent.client_secret,
       amount: amount / 100,
       currency,

@@ -20,6 +20,7 @@ interface Props {
 
 interface IntentResponse {
   demo: boolean;
+  livemode: boolean;
   clientSecret: string | null;
   amount: number;
   currency: string;
@@ -85,10 +86,12 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
         </dl>
       </div>
 
-      <p className="flex items-start gap-2 rounded-md bg-accent-tint px-4 py-3 text-xs text-accent-dark">
-        <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
-        {t("book.step4.testNotice")}
-      </p>
+      {intent && !intent.livemode && (
+        <p className="flex items-start gap-2 rounded-md bg-accent-tint px-4 py-3 text-xs text-accent-dark">
+          <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
+          {t("book.step4.testNotice")}
+        </p>
+      )}
 
       {!intent && !loadError && (
         <div className="flex items-center gap-2 text-sm text-ink-soft">
