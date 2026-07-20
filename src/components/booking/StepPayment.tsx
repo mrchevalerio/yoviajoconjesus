@@ -6,6 +6,7 @@ import { CircleNotch, Info, LockSimple } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getStripe } from "@/lib/stripeClient";
 import { fareForAddress } from "@/lib/pricing";
+import { formatTimeSlot } from "@/lib/calendar";
 import type { BookingData } from "./types";
 import RealPaymentForm from "./RealPaymentForm";
 import DemoPaymentForm from "./DemoPaymentForm";
@@ -26,7 +27,8 @@ interface IntentResponse {
 }
 
 export default function StepPayment({ data, onConfirmed, processing, setProcessing }: Props) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const locale = lang === "es" ? "es-US" : "en-US";
   const [intent, setIntent] = useState<IntentResponse | null>(null);
   const [loadError, setLoadError] = useState(false);
 
@@ -66,7 +68,7 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-soft">{t("book.step1.date")} / {t("book.step1.time")}</dt>
-            <dd className="text-ink">{data.date} · {data.time}</dd>
+            <dd className="text-ink">{data.date} · {data.time ? formatTimeSlot(data.time, locale) : data.time}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-soft">{t("book.step2.flightNumber")}</dt>

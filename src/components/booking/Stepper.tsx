@@ -20,9 +20,9 @@ export default function Stepper({ label, value, min, max, onChange }: Props) {
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
           aria-label="Decrease"
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-border-strong text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border-strong text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Minus size={14} aria-hidden />
+          <Minus size={16} aria-hidden />
         </button>
         <span className="w-4 text-center text-[15px] tabular-nums text-ink">{value}</span>
         <button
@@ -30,9 +30,9 @@ export default function Stepper({ label, value, min, max, onChange }: Props) {
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
           aria-label="Increase"
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-border-strong text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border-strong text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Plus size={14} aria-hidden />
+          <Plus size={16} aria-hidden />
         </button>
       </div>
     </div>
