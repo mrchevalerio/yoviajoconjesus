@@ -5,33 +5,31 @@ export interface Zone {
   baseFare: number;
 }
 
-/**
- * Placeholder flat-rate table. Replace baseFare values with real negotiated
- * rates before launch — these are illustrative, not pricing commitments.
- * One vehicle type, up to 3 passengers — no per-vehicle multiplier.
- */
+/** Single flat rate for all zones, regardless of pickup address. */
+const FLAT_FARE = 115;
+
 export const ZONES: Zone[] = [
   {
     id: "washington-heights",
     labelKey: "area.zone1.title",
     matches: /washington heights|155th|181st|wash\.?\s?heights/i,
-    baseFare: 75,
+    baseFare: FLAT_FARE,
   },
   {
     id: "inwood",
     labelKey: "area.zone2.title",
     matches: /inwood|dyckman/i,
-    baseFare: 80,
+    baseFare: FLAT_FARE,
   },
   {
     id: "bronx",
     labelKey: "area.zone3.title",
     matches: /bronx|riverdale|fordham|kingsbridge|pelham|morris/i,
-    baseFare: 95,
+    baseFare: FLAT_FARE,
   },
 ];
 
-const DEFAULT_BASE_FARE = 88;
+const DEFAULT_BASE_FARE = FLAT_FARE;
 
 export const MAX_PASSENGERS = 3;
 

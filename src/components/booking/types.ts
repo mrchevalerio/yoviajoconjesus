@@ -1,5 +1,3 @@
-import type { FlightLookupResult } from "@/app/api/flight-lookup/route";
-
 export interface BookingData {
   address: string;
   date: string;
@@ -8,7 +6,6 @@ export interface BookingData {
   luggage: number;
   airlineCode: string;
   flightNumber: string;
-  flightInfo: FlightLookupResult | null;
   name: string;
   phone: string;
   email: string;
@@ -22,7 +19,6 @@ export const INITIAL_BOOKING_DATA: BookingData = {
   luggage: 1,
   airlineCode: "",
   flightNumber: "",
-  flightInfo: null,
   name: "",
   phone: "",
   email: "",

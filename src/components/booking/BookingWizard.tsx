@@ -7,6 +7,7 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { EASE_OUT } from "@/lib/motion";
 import { MAX_PASSENGERS, fareForAddress } from "@/lib/pricing";
+import { formatTimeSlot } from "@/lib/calendar";
 import { supabase } from "@/lib/supabase";
 import ProgressBar from "./ProgressBar";
 import StepFlight from "./StepFlight";
@@ -32,7 +33,8 @@ function parseCount(raw: string | null, fallback: number, min: number, max: numb
 }
 
 export default function BookingWizard() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const locale = lang === "es" ? "es-US" : "en-US";
   const searchParams = useSearchParams();
 
   const [data, setData] = useState<BookingData>(() => ({
@@ -51,6 +53,9 @@ export default function BookingWizard() {
   const patch = (p: Partial<BookingData>) => setData((prev) => ({ ...prev, ...p }));
 
   async function handleConfirmed(reference: string) {
+    const formattedTime = data.time ? formatTimeSlot(data.time, locale) : "";
+    const fare = fareForAddress(data.address);
+
     const { error } = await supabase.from("bookings").insert({
       reference,
       full_name: data.name,
@@ -58,18 +63,37 @@ export default function BookingWizard() {
       phone: data.phone,
       address: data.address,
       pickup_date: data.date || null,
-      pickup_time: data.time || null,
+      pickup_time: formattedTime || null,
       passengers: data.passengers,
       luggage: data.luggage,
       airline_code: data.airlineCode,
       flight_number: data.flightNumber,
-      fare: fareForAddress(data.address),
+      fare,
       status: "confirmed",
     });
 
     // Payment already succeeded — don't block the confirmation screen on a
     // database hiccup, just leave a trace for follow-up.
     if (error) console.error("Failed to save booking:", error.message);
+
+    // Same reasoning — a failed confirmation email shouldn't block the
+    // confirmation screen either, just leave a trace for follow-up.
+    fetch("/api/send-confirmation-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lang,
+        reference,
+        email: data.email,
+        name: data.name,
+        address: data.address,
+        date: data.date,
+        time: formattedTime,
+        passengers: data.passengers,
+        luggage: data.luggage,
+        fare,
+      }),
+    }).catch((err) => console.error("Failed to send confirmation email:", err));
 
     setReference(reference);
   }

@@ -128,7 +128,7 @@ export default function Hero() {
           variants={fadeUp}
           className="mt-8 text-xs text-ink-faint"
         >
-          {t("hero.trust.onTime")} · {t("hero.trust.flatRate")} · {t("hero.trust.tracked")} · {t("hero.trust.insured")}
+          {t("hero.urgency")}
         </motion.p>
       </div>
     </section>
