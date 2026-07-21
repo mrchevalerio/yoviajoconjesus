@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { fareForAddress } from "@/lib/pricing";
 
 interface CreateIntentBody {
-  amount: number; // whole dollars
+  address: string;
   currency?: string;
 }
 
@@ -11,15 +12,15 @@ interface CreateIntentBody {
  * looks like sk_test_...) to start creating real PaymentIntents. Until
  * then this route returns a `demo: true` response and the checkout step
  * runs a simulated payment so the full flow stays clickable end to end.
+ *
+ * The fare is always computed here from the address, never trusted from the
+ * client — otherwise a tampered request could pay less than the real price.
  */
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as CreateIntentBody;
-  const amount = Math.round(Number(body.amount) * 100);
+  const fare = fareForAddress(body.address ?? "");
+  const amount = Math.round(fare * 100);
   const currency = body.currency ?? "usd";
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-  }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
 

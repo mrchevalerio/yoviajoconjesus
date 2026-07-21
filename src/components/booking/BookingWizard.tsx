@@ -6,9 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { EASE_OUT } from "@/lib/motion";
-import { MAX_PASSENGERS, fareForAddress } from "@/lib/pricing";
-import { formatTimeSlot } from "@/lib/calendar";
-import { supabase } from "@/lib/supabase";
+import { MAX_PASSENGERS } from "@/lib/pricing";
 import ProgressBar from "./ProgressBar";
 import StepFlight from "./StepFlight";
 import StepContact from "./StepContact";
@@ -34,7 +32,6 @@ function parseCount(raw: string | null, fallback: number, min: number, max: numb
 
 export default function BookingWizard() {
   const { t, lang } = useLanguage();
-  const locale = lang === "es" ? "es-US" : "en-US";
   const searchParams = useSearchParams();
 
   const [data, setData] = useState<BookingData>(() => ({
@@ -49,53 +46,42 @@ export default function BookingWizard() {
   const [direction, setDirection] = useState<1 | -1>(1);
   const [processing, setProcessing] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState(false);
 
   const patch = (p: Partial<BookingData>) => setData((prev) => ({ ...prev, ...p }));
 
-  async function handleConfirmed(reference: string) {
-    const formattedTime = data.time ? formatTimeSlot(data.time, locale) : "";
-    const fare = fareForAddress(data.address);
-
-    const { error } = await supabase.from("bookings").insert({
-      reference,
-      full_name: data.name,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      pickup_date: data.date || null,
-      pickup_time: formattedTime || null,
-      passengers: data.passengers,
-      luggage: data.luggage,
-      airline_code: data.airlineCode,
-      flight_number: data.flightNumber,
-      fare,
-      status: "confirmed",
-    });
-
-    // Payment already succeeded — don't block the confirmation screen on a
-    // database hiccup, just leave a trace for follow-up.
-    if (error) console.error("Failed to save booking:", error.message);
-
-    // Same reasoning — a failed confirmation email shouldn't block the
-    // confirmation screen either, just leave a trace for follow-up.
-    fetch("/api/send-confirmation-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lang,
-        reference,
-        email: data.email,
-        name: data.name,
-        address: data.address,
-        date: data.date,
-        time: formattedTime,
-        passengers: data.passengers,
-        luggage: data.luggage,
-        fare,
-      }),
-    }).catch((err) => console.error("Failed to send confirmation email:", err));
-
-    setReference(reference);
+  async function handleConfirmed(paymentIntentId: string) {
+    setConfirmError(false);
+    try {
+      const res = await fetch("/api/confirm-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentIntentId,
+          lang,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          date: data.date,
+          time: data.time,
+          passengers: data.passengers,
+          luggage: data.luggage,
+          airlineCode: data.airlineCode,
+          flightNumber: data.flightNumber,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.reference) {
+        setConfirmError(true);
+        return;
+      }
+      setReference(json.reference);
+    } catch {
+      setConfirmError(true);
+    } finally {
+      setProcessing(false);
+    }
   }
 
   function goNext() {
@@ -143,6 +129,12 @@ export default function BookingWizard() {
           />
         )}
       </motion.div>
+
+      {confirmError && (
+        <p className="mt-4 rounded-md bg-danger-tint px-4 py-3 text-sm text-danger">
+          {t("book.confirmError")}
+        </p>
+      )}
 
       {step < TOTAL_STEPS && (
         <div className="mt-10 flex items-center justify-between">

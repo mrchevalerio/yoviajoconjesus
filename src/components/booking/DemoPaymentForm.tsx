@@ -26,7 +26,8 @@ export default function DemoPaymentForm({ amount, processing, setProcessing, onC
     e.preventDefault();
     setProcessing(true);
     setTimeout(() => {
-      setProcessing(false);
+      // Processing stays true — onConfirmed still has to verify with the
+      // server and save the booking before this step is really done.
       onConfirmed(`YVCJ-${Date.now().toString(36).toUpperCase()}`);
     }, 1200);
   }

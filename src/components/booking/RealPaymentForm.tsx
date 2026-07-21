@@ -29,13 +29,14 @@ export default function RealPaymentForm({ processing, setProcessing, onConfirmed
       redirect: "if_required",
     });
 
-    setProcessing(false);
-
     if (confirmError) {
+      setProcessing(false);
       setError(confirmError.message ?? "Payment failed. Please try again.");
       return;
     }
 
+    // Processing stays true — onConfirmed still has to verify with the
+    // server and save the booking before this step is really done.
     onConfirmed(paymentIntent?.id ?? `YVCJ-${Date.now().toString(36).toUpperCase()}`);
   }
 

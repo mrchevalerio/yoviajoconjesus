@@ -40,7 +40,7 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: fare }),
+      body: JSON.stringify({ address: data.address }),
     })
       .then((res) => res.json())
       .then((json: IntentResponse) => {
@@ -52,7 +52,7 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
     return () => {
       cancelled = true;
     };
-  }, [fare]);
+  }, [data.address]);
 
   return (
     <div className="flex flex-col gap-6">
