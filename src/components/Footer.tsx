@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { WhatsappLogo, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
+import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function Footer() {
@@ -47,9 +47,6 @@ export default function Footer() {
               <a href="https://wa.me/13474606696" target="_blank" rel="noopener" className="hover:text-ink">
                 (347) 460-6696
               </a>
-            </li>
-            <li className="flex items-center gap-2">
-              <EnvelopeSimple size={16} className="text-accent" aria-hidden /> info@yoviajoconjesus.com
             </li>
             <li className="text-ink-faint">{t("footer.hours")}</li>
           </ul>

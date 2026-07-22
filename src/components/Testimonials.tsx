@@ -35,7 +35,8 @@ export default function Testimonials() {
             <span className="mb-4 block text-[13px] font-semibold uppercase tracking-[0.08em] text-accent-dark">
               {t("testimonials.eyebrow")}
             </span>
-            <h2 className="text-[clamp(28px,3.6vw,40px)]">{t("testimonials.title")}</h2>
+            <h2 className="mb-3 text-[clamp(28px,3.6vw,40px)]">{t("testimonials.title")}</h2>
+            <p className="text-[15px] leading-relaxed text-ink-soft">{t("testimonials.intro")}</p>
           </div>
 
           <div className="flex items-center gap-3 sm:flex-col sm:items-end sm:gap-1.5">

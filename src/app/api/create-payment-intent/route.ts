@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { fareForAddress } from "@/lib/pricing";
+import { applyPromoDiscount } from "@/lib/promoCodes";
 
 interface CreateIntentBody {
   address: string;
+  promoCode?: string;
   currency?: string;
 }
 
@@ -13,12 +15,14 @@ interface CreateIntentBody {
  * then this route returns a `demo: true` response and the checkout step
  * runs a simulated payment so the full flow stays clickable end to end.
  *
- * The fare is always computed here from the address, never trusted from the
- * client — otherwise a tampered request could pay less than the real price.
+ * The fare (and any promo discount) is always computed here, never trusted
+ * from the client — otherwise a tampered request could pay less than the
+ * real price.
  */
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as CreateIntentBody;
-  const fare = fareForAddress(body.address ?? "");
+  const baseFare = fareForAddress(body.address ?? "");
+  const { fare, discount, valid: promoValid } = applyPromoDiscount(baseFare, body.promoCode);
   const amount = Math.round(fare * 100);
   const currency = body.currency ?? "usd";
 
@@ -30,6 +34,8 @@ export async function POST(request: NextRequest) {
       livemode: false,
       clientSecret: null,
       amount: amount / 100,
+      discount,
+      promoValid,
       currency,
     });
   }
@@ -47,6 +53,8 @@ export async function POST(request: NextRequest) {
       livemode: paymentIntent.livemode,
       clientSecret: paymentIntent.client_secret,
       amount: amount / 100,
+      discount,
+      promoValid,
       currency,
     });
   } catch (error) {

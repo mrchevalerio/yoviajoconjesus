@@ -57,6 +57,7 @@ export const translations = {
 
     "testimonials.eyebrow": "Trusted locally",
     "testimonials.title": "Word travels fast in the neighborhood",
+    "testimonials.intro": "With more than 10 years of experience in airport transfers and hundreds of satisfied clients, we've built our reputation one ride at a time.",
     "testimonials.rating": "4.9",
     "testimonials.ratingNote": "Based on 210+ rides across Washington Heights, Inwood & the Bronx",
     "testimonials.t1.quote":
@@ -136,6 +137,11 @@ export const translations = {
     "book.step4.title": "Payment",
     "book.step4.testNotice": "Test mode — no real charge will be made. Use card 4242 4242 4242 4242.",
     "book.step4.summary": "Order summary",
+    "book.step4.promoLabel": "Discount code",
+    "book.step4.promoPlaceholder": "Enter your code",
+    "book.step4.promoApply": "Apply",
+    "book.step4.promoInvalid": "That code isn't valid.",
+    "book.step4.promoApplied": "Code applied!",
     "book.step4.pay": "Pay & confirm",
     "book.step4.processing": "Processing…",
     "book.confirmError": "Your payment went through, but we couldn't save your booking. Please message us on WhatsApp at (347) 460-6696 so we can confirm it manually.",
@@ -226,6 +232,7 @@ export const translations = {
 
     "testimonials.eyebrow": "Confianza del vecindario",
     "testimonials.title": "La noticia vuela rápido en el barrio",
+    "testimonials.intro": "Con más de 10 años de experiencia en traslados al aeropuerto y cientos de clientes satisfechos, hemos construido nuestra reputación viaje tras viaje.",
     "testimonials.rating": "4.9",
     "testimonials.ratingNote": "Basado en más de 210 viajes en Washington Heights, Inwood y el Bronx",
     "testimonials.t1.quote":
@@ -305,6 +312,11 @@ export const translations = {
     "book.step4.title": "Pago",
     "book.step4.testNotice": "Modo de prueba — no se hará ningún cargo real. Usa la tarjeta 4242 4242 4242 4242.",
     "book.step4.summary": "Resumen del pedido",
+    "book.step4.promoLabel": "Código de descuento",
+    "book.step4.promoPlaceholder": "Ingresa tu código",
+    "book.step4.promoApply": "Aplicar",
+    "book.step4.promoInvalid": "Ese código no es válido.",
+    "book.step4.promoApplied": "¡Código aplicado!",
     "book.step4.pay": "Pagar y confirmar",
     "book.step4.processing": "Procesando…",
     "book.confirmError": "Tu pago se procesó, pero no pudimos guardar tu reserva. Escríbenos por WhatsApp al (347) 460-6696 para confirmarla manualmente.",

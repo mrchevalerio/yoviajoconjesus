@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
-import { CircleNotch, Info, LockSimple } from "@phosphor-icons/react/dist/ssr";
+import { CircleNotch, Info, LockSimple, Tag } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getStripe } from "@/lib/stripeClient";
 import { fareForAddress } from "@/lib/pricing";
@@ -13,7 +13,7 @@ import DemoPaymentForm from "./DemoPaymentForm";
 
 interface Props {
   data: BookingData;
-  onConfirmed: (reference: string) => void;
+  onConfirmed: (reference: string, promoCode?: string) => void;
   processing: boolean;
   setProcessing: (v: boolean) => void;
 }
@@ -23,6 +23,8 @@ interface IntentResponse {
   livemode: boolean;
   clientSecret: string | null;
   amount: number;
+  discount: number;
+  promoValid: boolean;
   currency: string;
   error?: string;
 }
@@ -32,15 +34,19 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
   const locale = lang === "es" ? "es-US" : "en-US";
   const [intent, setIntent] = useState<IntentResponse | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState("");
+  const [promoTouched, setPromoTouched] = useState(false);
 
   const fare = fareForAddress(data.address);
 
   useEffect(() => {
     let cancelled = false;
+    setIntent(null);
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address: data.address }),
+      body: JSON.stringify({ address: data.address, promoCode: appliedPromo }),
     })
       .then((res) => res.json())
       .then((json: IntentResponse) => {
@@ -52,7 +58,19 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
     return () => {
       cancelled = true;
     };
-  }, [data.address]);
+  }, [data.address, appliedPromo]);
+
+  function handleApplyPromo() {
+    setPromoTouched(true);
+    setAppliedPromo(promoInput);
+  }
+
+  const total = intent ? intent.amount : fare;
+  const promoInvalid = promoTouched && appliedPromo && intent && !intent.promoValid;
+
+  function handleConfirmedWithPromo(reference: string) {
+    onConfirmed(reference, intent?.promoValid ? appliedPromo : undefined);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,9 +99,51 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
           </div>
           <div className="mt-2 flex justify-between gap-4 border-t border-border pt-2 text-base font-semibold">
             <dt className="text-ink">Total</dt>
-            <dd className="tabular-nums text-ink">${fare}</dd>
+            <dd className="tabular-nums text-ink">
+              {intent && intent.discount > 0 ? (
+                <>
+                  <span className="mr-2 text-sm font-normal text-ink-faint line-through">${fare}</span>
+                  ${total}
+                </>
+              ) : (
+                `$${total}`
+              )}
+            </dd>
           </div>
         </dl>
+      </div>
+
+      <div className="rounded-md border border-border bg-surface p-4">
+        <label htmlFor="promo" className="mb-1.5 block text-sm font-medium text-ink">
+          {t("book.step4.promoLabel")}
+        </label>
+        <div className="flex gap-2">
+          <div className="flex flex-1 items-center gap-2.5 rounded-md border border-border-strong bg-bg px-4 py-2.5 focus-within:border-accent">
+            <Tag size={18} className="shrink-0 text-ink-faint" aria-hidden />
+            <input
+              id="promo"
+              type="text"
+              value={promoInput}
+              onChange={(e) => setPromoInput(e.target.value)}
+              placeholder={t("book.step4.promoPlaceholder")}
+              className="w-full min-w-0 bg-transparent text-[15px] text-ink placeholder:text-ink-faint focus:outline-none"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleApplyPromo}
+            disabled={!promoInput.trim()}
+            className="rounded-md border border-border-strong px-4 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {t("book.step4.promoApply")}
+          </button>
+        </div>
+        {promoInvalid && <p className="mt-1.5 text-xs text-danger">{t("book.step4.promoInvalid")}</p>}
+        {intent?.promoValid && (
+          <p className="mt-1.5 text-xs text-success">
+            {t("book.step4.promoApplied")} (-${intent.discount})
+          </p>
+        )}
       </div>
 
       {intent && !intent.livemode && (
@@ -106,16 +166,16 @@ export default function StepPayment({ data, onConfirmed, processing, setProcessi
 
       {intent && !intent.clientSecret && (
         <DemoPaymentForm
-          amount={fare}
+          amount={total}
           processing={processing}
           setProcessing={setProcessing}
-          onConfirmed={onConfirmed}
+          onConfirmed={handleConfirmedWithPromo}
         />
       )}
 
       {intent && intent.clientSecret && (
-        <Elements stripe={getStripe()} options={{ clientSecret: intent.clientSecret }}>
-          <RealPaymentForm processing={processing} setProcessing={setProcessing} onConfirmed={onConfirmed} />
+        <Elements key={intent.clientSecret} stripe={getStripe()} options={{ clientSecret: intent.clientSecret }}>
+          <RealPaymentForm processing={processing} setProcessing={setProcessing} onConfirmed={handleConfirmedWithPromo} />
         </Elements>
       )}
 

@@ -50,7 +50,7 @@ export default function BookingWizard() {
 
   const patch = (p: Partial<BookingData>) => setData((prev) => ({ ...prev, ...p }));
 
-  async function handleConfirmed(paymentIntentId: string) {
+  async function handleConfirmed(paymentIntentId: string, promoCode?: string) {
     setConfirmError(false);
     try {
       const res = await fetch("/api/confirm-booking", {
@@ -69,6 +69,7 @@ export default function BookingWizard() {
           luggage: data.luggage,
           airlineCode: data.airlineCode,
           flightNumber: data.flightNumber,
+          promoCode,
         }),
       });
       const json = await res.json();

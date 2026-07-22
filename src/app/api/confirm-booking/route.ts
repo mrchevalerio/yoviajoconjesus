@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { fareForAddress } from "@/lib/pricing";
+import { applyPromoDiscount } from "@/lib/promoCodes";
 import { formatTimeSlot } from "@/lib/calendar";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { sendConfirmationEmail } from "@/lib/email";
@@ -18,6 +19,7 @@ interface ConfirmBookingBody {
   luggage: number;
   airlineCode: string;
   flightNumber: string;
+  promoCode?: string;
 }
 
 /**
@@ -34,7 +36,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const fare = fareForAddress(body.address ?? "");
+  const baseFare = fareForAddress(body.address ?? "");
+  const { fare } = applyPromoDiscount(baseFare, body.promoCode);
   const secretKey = process.env.STRIPE_SECRET_KEY;
 
   if (secretKey) {
